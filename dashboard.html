@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <!-- Include Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <!-- Div to hold the Plotly graph -->
+    <div id="plot"></div>
+
+    <!-- JavaScript to render the Plotly graph using the JSON data -->
+    <script>
+        // Parse the JSON data
+        var graphJSON = {{ graphJSON | safe }};
+
+        // Render the Plotly graph
+        Plotly.newPlot('plot', graphJSON.data, graphJSON.layout);
+    </script>
+</body>
+</html>

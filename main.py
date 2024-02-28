@@ -1,33 +1,30 @@
-# Import necessary libraries
-from flask import Flask, render_template
-import plotly.express as px
-import pandas as pd
+from flask import Flask, redirect, render_template, request, session, url_for
+from flask_session import Session
+import os
+import identity
+import identity.web
+from werkzeug.middleware.proxy_fix import ProxyFix
 
-# Initialize Flask app
+CLIENT_ID = "c7320191-085c-4393-973b-80735077908a"
+CLIENT_SECRET = "c5ff174f-d524-4eec-b8c7-f1eb620e2d9e"
+os.environ["TENANT_ID"] = "0ae51e19-07c8-4e4b-bb6d-648ee58410f4"
+AUTHORITY = f"https://login.microsoftonline.com/{os.getenv('TENANT_ID', 'common')}"
+
 app = Flask(__name__)
+Session(app)
 
-# Sample data
-data = {
-    'Name': ['Alice', 'Bob', 'Charlie', 'David'],
-    'Age': [25, 30, 35, 40],
-    'Salary': [50000, 60000, 70000, 80000]
-}
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-# Convert data to DataFrame
-df = pd.DataFrame(data)
+auth = identity.web.Auth(
+    session=session,
+    authority=AUTHORITY,
+    client_id=CLIENT_ID,
+    client_credential=CLIENT_SECRET,
+)
 
-# Define route for the dashboard
 @app.route('/')
-def dashboard():
-    # Create a scatter plot using Plotly
-    fig = px.scatter(df, x='Age', y='Salary', color='Name', title='Salary vs Age')
-
-    # Convert Plotly figure to JSON
-    graphJSON = fig.to_json()
-
-    # Render the dashboard template with the Plotly figure JSON
-    return render_template('dashboard.html', graphJSON=graphJSON)
+def hello_world():
+    return 'Hello, World!'
 
 if __name__ == '__main__':
-    # Run the Flask app
-    app.run(debug=True)
+    app.run()
